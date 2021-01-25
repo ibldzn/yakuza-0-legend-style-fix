@@ -1,36 +1,20 @@
 #include "hooks.h"
 
-static hooks::change_style::fn o_change_style = nullptr;
 static hooks::get_key_press::fn o_get_key_press = nullptr;
 static hooks::get_current_style::fn o_get_current_style = nullptr;
 
 static bool should_change_to_legend = false;
-static uintptr_t* sub_140359E80_arg = nullptr;
-
 /*static hooks::sub_1409ADDB0::fn o_sub_1409ADDB0 = nullptr;*/
 
 void hooks::init()
 {
-    auto hook_at = mem::follow(mem::ida_pattern_scan("E8 ? ? ? ? 89 B7 ? ? ? ? FF 87 ? ? ? ?"));
-    if (!mem::hook(hook_at, hooks::change_style::hook_func, &o_change_style))
-        throw std::runtime_error("Failed to hook change_style function!");
-
-    hook_at = mem::follow(mem::ida_pattern_scan("E8 ? ? ? ? F3 0F 59 30"));
+    auto hook_at = mem::follow(mem::ida_pattern_scan("E8 ? ? ? ? F3 0F 59 30"));
     if (!mem::hook(hook_at, hooks::get_key_press::hook_func, &o_get_key_press))
         throw std::runtime_error("Failed to hook get_key_press function!");
 
     hook_at = mem::follow(mem::ida_pattern_scan("E8 ? ? ? ? 3B D8 75 0A"));
     if (!mem::hook(hook_at, hooks::get_current_style::hook_func, &o_get_current_style))
         throw std::runtime_error("Failed to hook get_current_style function!");
-}
-
-__int64 __fastcall hooks::change_style::hook_func(unsigned __int64 is_majima, int style)
-{
-    static uintptr_t change_style_from_pause_menu = mem::ida_pattern_scan("E8 ? ? ? ? 85 C0 75 2B 48 8B 0D ? ? ? ? 48");
-    if (reinterpret_cast<uintptr_t>(_ReturnAddress()) == change_style_from_pause_menu)
-        return o_change_style(is_majima, style);
-
-    return o_change_style(is_majima, style);
 }
 
 signed __int64 __fastcall hooks::get_key_press::hook_func(__int64 a1)
@@ -58,6 +42,14 @@ signed __int64 __fastcall hooks::get_key_press::hook_func(__int64 a1)
             else if (*reinterpret_cast<WORD*>(ret + 8) & 0x800)     // if beast/slugger key is presed
                 *reinterpret_cast<WORD*>(ret + 8) = 0x800;
         }
+        else
+        {
+            if (should_change_to_legend)
+            {
+                *reinterpret_cast<BYTE*>(ret + 9) = 0x1;
+                should_change_to_legend = false;
+            }
+        }
     }
 
     return ret;
@@ -80,16 +72,19 @@ signed __int64 __fastcall hooks::get_current_style::hook_func()
             return static_cast<short>(-1);
         }();
 
+        if (index == -1)
+            return ret;
+
+        XINPUT_STATE state{};
+        if (XInputGetState(index, &state) != ERROR_SUCCESS)
+            return ret;
+
         if (ret != 3)
         {
-            if (index != -1)
+            if (state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB)
             {
-                XINPUT_STATE state{};
-                if (XInputGetState(index, &state) == ERROR_SUCCESS)
-                {
-                    if (state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
-                        ret = 3;
-                }
+                should_change_to_legend = true;
+                ret = 3;
             }
 
             if (GetAsyncKeyState(VK_TAB))

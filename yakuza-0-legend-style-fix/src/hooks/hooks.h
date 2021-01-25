@@ -14,12 +14,6 @@ namespace hooks
 {
 	void init();
 
-	namespace change_style
-	{
-		using fn = __int64(__fastcall*)(unsigned __int64 is_majima, int style);
-		__int64 __fastcall hook_func(unsigned __int64 is_majima, int style);
-	}
-
 	namespace get_key_press
 	{
 		using fn = signed __int64(__fastcall*)(__int64 a1);
