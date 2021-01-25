@@ -4,7 +4,6 @@ static hooks::get_key_press::fn o_get_key_press = nullptr;
 static hooks::get_current_style::fn o_get_current_style = nullptr;
 
 static bool should_change_to_legend = false;
-/*static hooks::sub_1409ADDB0::fn o_sub_1409ADDB0 = nullptr;*/
 
 void hooks::init()
 {
