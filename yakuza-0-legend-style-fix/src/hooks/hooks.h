@@ -20,9 +20,15 @@ namespace hooks
 		__int64 __fastcall hook_func(unsigned __int64 is_majima, int style);
 	}
 
-	namespace sub_1409ADDB0
+	namespace get_key_press
 	{
-		using fn = __int64(__fastcall*)(__int64 a1);
-		__int64 __fastcall hook_func(__int64 a1);
+		using fn = signed __int64(__fastcall*)(__int64 a1);
+		signed __int64 __fastcall hook_func(__int64 a1);
+	}
+
+	namespace get_current_style
+	{
+		using fn = signed __int64(__fastcall*)();
+		signed __int64 __fastcall hook_func();
 	}
 }
