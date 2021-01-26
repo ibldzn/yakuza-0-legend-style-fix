@@ -1,7 +1,6 @@
 #pragma once
-#include <iostream>
+#include <cstdint>
 #include <intrin.h>
-#include <algorithm>
 
 #define WIN32_LEAN_AND_MEAN
 #  include <Windows.h>
@@ -16,13 +15,13 @@ namespace hooks
 
     namespace get_key_press
     {
-        using fn = signed __int64(__fastcall*)(__int64 a1);
-        signed __int64 __fastcall hook_func(__int64 a1);
+        using fn = std::int64_t(__fastcall*)(std::int64_t a1);
+        std::int64_t __fastcall hook_func(std::int64_t a1);
     }
 
     namespace get_current_style
     {
-        using fn = signed __int64(__fastcall*)();
-        signed __int64 __fastcall hook_func();
+        using fn = std::int64_t(__fastcall*)();
+        std::int64_t __fastcall hook_func();
     }
 }

@@ -6,7 +6,7 @@ void mem::init()
 {
     if (!initialized)
         if (MH_Initialize() != MH_OK)
-            throw std::runtime_error("Failed to initialize minhook!");
+            throw std::runtime_error("mem::init - Failed to initialize minhook!");
 
     initialized = true;
 }
@@ -31,7 +31,7 @@ uintptr_t mem::ida_pattern_scan(const char* pattern)
     {
         char* start = const_cast<char*>(_pattern);
         char* end = start + strlen(_pattern);
-        auto ret = std::vector<int>();
+        std::vector<int> ret = {};
 
         for (char* current = start; current < end; ++current)
         {
@@ -51,7 +51,7 @@ uintptr_t mem::ida_pattern_scan(const char* pattern)
 
     const auto pattern_bytes = pattern_to_bytes(pattern);
     const auto pattern_data = pattern_bytes.data();
-    const size_t pattern_size = pattern_bytes.size();
+    const auto pattern_size = pattern_bytes.size();
 
     static const HMODULE mod_handle = GetModuleHandleA(NULL);
     if (!mod_handle)
