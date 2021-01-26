@@ -35,15 +35,15 @@ uintptr_t mem::ida_pattern_scan(const char* pattern)
 
         for (char* current = start; current < end; ++current)
         {
-			if (*current == '?')
-			{
+            if (*current == '?')
+            {
                 ret.push_back(-1);
-				current++;
-			}
-			else
-			{
+                current++;
+            }
+            else
+            {
                 ret.push_back(std::strtoul(current, &current, 16));
-			}
+            }
         }
 
         return ret;
@@ -56,7 +56,7 @@ uintptr_t mem::ida_pattern_scan(const char* pattern)
     static const HMODULE mod_handle = GetModuleHandleA(NULL);
     if (!mod_handle)
         return uintptr_t();
-    
+
     const BYTE* image_bytes = reinterpret_cast<BYTE*>(mod_handle);
 
     MODULEINFO mod_info;
@@ -67,7 +67,7 @@ uintptr_t mem::ida_pattern_scan(const char* pattern)
     for (size_t i = 0; i < image_size - pattern_size; ++i)
     {
         bool found = true;
-        
+
         for (int j = 0; j < pattern_size; ++j)
         {
             if (image_bytes[i + j] != pattern_data[j] && pattern_data[j] != -1)

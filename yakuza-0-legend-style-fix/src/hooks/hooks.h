@@ -12,17 +12,17 @@
 
 namespace hooks
 {
-	void init();
+    void init();
 
-	namespace get_key_press
-	{
-		using fn = signed __int64(__fastcall*)(__int64 a1);
-		signed __int64 __fastcall hook_func(__int64 a1);
-	}
+    namespace get_key_press
+    {
+        using fn = signed __int64(__fastcall*)(__int64 a1);
+        signed __int64 __fastcall hook_func(__int64 a1);
+    }
 
-	namespace get_current_style
-	{
-		using fn = signed __int64(__fastcall*)();
-		signed __int64 __fastcall hook_func();
-	}
+    namespace get_current_style
+    {
+        using fn = signed __int64(__fastcall*)();
+        signed __int64 __fastcall hook_func();
+    }
 }
