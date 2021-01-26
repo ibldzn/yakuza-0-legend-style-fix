@@ -71,23 +71,26 @@ signed __int64 __fastcall hooks::get_current_style::hook_func()
             return static_cast<short>(-1);
         }();
 
-        if (index == -1)
-            return ret;
-
-        XINPUT_STATE state{};
-        if (XInputGetState(index, &state) != ERROR_SUCCESS)
-            return ret;
-
         if (ret != 3)
         {
-            if (state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB)
+            if (GetAsyncKeyState(VK_TAB))
             {
                 should_change_to_legend = true;
                 ret = 3;
             }
 
-            if (GetAsyncKeyState(VK_TAB))
-                ret = 3;
+            if (index != -1)
+            {
+                XINPUT_STATE state{};
+                if (XInputGetState(index, &state) == ERROR_SUCCESS)
+                {
+                    if (state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB)
+                    {
+                        should_change_to_legend = true;
+                        ret = 3;
+                    }
+                }
+            }
         }
         else
         {
