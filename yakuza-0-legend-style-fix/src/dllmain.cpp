@@ -1,5 +1,8 @@
 #include <stdexcept>
-#include <Windows.h>
+
+#define WIN32_LEAN_AND_MEAN
+#  include <Windows.h>
+#undef WIN32_LEAN_AND_MEAN
 
 #include "proxy/proxy.h"
 #include "mem/mem.h"

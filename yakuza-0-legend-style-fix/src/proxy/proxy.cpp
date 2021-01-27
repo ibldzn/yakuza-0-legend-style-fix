@@ -4,62 +4,37 @@
 #  define PROXY_API extern "C" __declspec(dllexport)
 #endif
 
-static proxy::ArcadeTestDLL_CanInsertCoin_t proxy::o_ArcadeTestDLL_CanInsertCoin = nullptr;
-static proxy::ArcadeTestDLL_CanStartGame_t	proxy::o_ArcadeTestDLL_CanStartGame = nullptr;
-static proxy::ArcadeTestDLL_InitRom_t		proxy::o_ArcadeTestDLL_InitRom = nullptr;
-static proxy::ArcadeTestDLL_Shutdown_t		proxy::o_ArcadeTestDLL_Shutdown = nullptr;
-static proxy::ArcadeTestDLL_Update_t		proxy::o_ArcadeTestDLL_Update = nullptr;
+static proxy::CreateDXGIFactory1_t proxy::o_CreateDXGIFactory1 = nullptr;
+static proxy::CreateDXGIFactory2_t proxy::o_CreateDXGIFactory2 = nullptr;
 
-PROXY_API bool ArcadeTestDLL_CanInsertCoin()
+PROXY_API HRESULT CreateDXGIFactory1(REFIID riid, void** ppFactory)
 {
-    return proxy::o_ArcadeTestDLL_CanInsertCoin();
+    return proxy::o_CreateDXGIFactory1(riid, ppFactory);
 }
 
-PROXY_API bool ArcadeTestDLL_CanStartGame()
+PROXY_API HRESULT CreateDXGIFactory2(UINT Flag, REFIID riid, void** ppFactory)
 {
-    return proxy::o_ArcadeTestDLL_CanStartGame();
-}
-
-PROXY_API bool __fastcall ArcadeTestDLL_InitRom(std::int64_t a1, std::int16_t* a2, std::uint16_t* a3, std::int64_t a4, bool a5, std::int64_t a6)
-{
-    return proxy::o_ArcadeTestDLL_InitRom(a1, a2, a3, a4, a5, a6);
-}
-
-PROXY_API std::int64_t ArcadeTestDLL_Shutdown()
-{
-    return proxy::o_ArcadeTestDLL_Shutdown();
-}
-
-PROXY_API bool __fastcall ArcadeTestDLL_Update(std::int64_t a1, std::int64_t a2, std::int64_t* a3, std::int64_t a4)
-{
-    return proxy::o_ArcadeTestDLL_Update(a1, a2, a3, a4);
-}
-
-void proxy::init()
-{
-    HMODULE libtgsa = LoadLibraryA("libtgsa_o.dll");
-    if (!libtgsa)
-        throw std::runtime_error("proxy::init - Failed to load original libtgsa.dll!");
-
-    proxy::o_ArcadeTestDLL_CanInsertCoin = reinterpret_cast<proxy::ArcadeTestDLL_CanInsertCoin_t>(GetProcAddress(libtgsa, "ArcadeTestDLL_CanInsertCoin"));
-    if (!proxy::o_ArcadeTestDLL_CanInsertCoin)
-        throw std::runtime_error("proxy::init - Failed to get function address for ArcadeTestDLL_CanInsertCoin!");
-
-    proxy::o_ArcadeTestDLL_CanStartGame = reinterpret_cast<proxy::ArcadeTestDLL_CanStartGame_t>(GetProcAddress(libtgsa, "ArcadeTestDLL_CanStartGame"));
-    if (!proxy::o_ArcadeTestDLL_CanStartGame)
-        throw std::runtime_error("proxy::init - Failed to get function address for ArcadeTestDLL_CanStartGame!");
-
-    proxy::o_ArcadeTestDLL_InitRom = reinterpret_cast<proxy::ArcadeTestDLL_InitRom_t>(GetProcAddress(libtgsa, "ArcadeTestDLL_InitRom"));
-    if (!proxy::o_ArcadeTestDLL_InitRom)
-        throw std::runtime_error("proxy::init - Failed to get function address for ArcadeTestDLL_InitRom!");
-
-    proxy::o_ArcadeTestDLL_Shutdown = reinterpret_cast<proxy::ArcadeTestDLL_Shutdown_t>(GetProcAddress(libtgsa, "ArcadeTestDLL_Shutdown"));
-    if (!proxy::o_ArcadeTestDLL_Shutdown)
-        throw std::runtime_error("proxy::init - Failed to get function address for ArcadeTestDLL_Shutdown!");
-
-    proxy::o_ArcadeTestDLL_Update = reinterpret_cast<proxy::ArcadeTestDLL_Update_t>(GetProcAddress(libtgsa, "ArcadeTestDLL_Update"));
-    if (!proxy::o_ArcadeTestDLL_Update)
-        throw std::runtime_error("proxy::init - Failed to get function address for ArcadeTestDLL_Update!");
+    return proxy::o_CreateDXGIFactory2(Flag, riid, ppFactory);
 }
 
 #undef PROXY_API
+
+void proxy::init()
+{
+    char system_path[MAX_PATH]{};
+    if (GetSystemDirectoryA(system_path, MAX_PATH) == NULL)
+        throw std::runtime_error("proxy::init - Failed to get system path!");
+
+    std::string dxgi_path = std::string(system_path) + "\\dxgi.dll";
+    HMODULE dxgi = LoadLibraryA(dxgi_path.c_str());
+    if (!dxgi)
+        throw std::runtime_error("proxy::init - Failed to load original dxgi.dll!");
+
+    proxy::o_CreateDXGIFactory1 = reinterpret_cast<proxy::CreateDXGIFactory1_t>(GetProcAddress(dxgi, "CreateDXGIFactory1"));
+    if (!proxy::o_CreateDXGIFactory1)
+        throw std::runtime_error("proxy::init - Failed to get address for CreateDXGIFactory1!");
+
+    proxy::o_CreateDXGIFactory2 = reinterpret_cast<proxy::CreateDXGIFactory2_t>(GetProcAddress(dxgi, "CreateDXGIFactory2"));
+    if (!proxy::o_CreateDXGIFactory2)
+        throw std::runtime_error("proxy::init - Failed to get address for CreateDXGIFactory2!");
+}
