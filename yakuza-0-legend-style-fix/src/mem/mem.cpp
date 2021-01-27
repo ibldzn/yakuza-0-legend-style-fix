@@ -16,10 +16,10 @@ bool mem::destroy()
     if (!initialized)
         return true;
 
-    if (MH_Uninitialize() != MH_OK)
+    if (MH_DisableHook(MH_ALL_HOOKS) != MH_OK)
         return false;
 
-    if (MH_DisableHook(MH_ALL_HOOKS) != MH_OK)
+    if (MH_Uninitialize() != MH_OK)
         return false;
 
     return true;
