@@ -22,32 +22,16 @@ std::int64_t __fastcall hooks::get_key_press::hook_func(std::int64_t a1)
     static uintptr_t last_call = mem::ida_pattern_scan("B9 ? ? ? ? 66 85 48 08 74 68");
     uintptr_t return_address = reinterpret_cast<uintptr_t>(_ReturnAddress());
 
-    std::int64_t current_style = o_get_current_style();
-
     std::int64_t ret = o_get_key_press(a1);
 
     // check if call was made from sub_140359E80
     // TODO: find a more proper way to check this
     if (return_address >= first_call && return_address <= last_call)
     {
-        if (current_style == 3)
+        if (should_change_to_legend)
         {
-            if (*reinterpret_cast<BYTE*>(ret + 9) & 0x1)            // if brawler/thug key is pressed
-                *reinterpret_cast<BYTE*>(ret + 9) = 0x1;
-
-            else if (*reinterpret_cast<WORD*>(ret + 8) & 0x400)     // if rush/breaker key is pressed
-                *reinterpret_cast<WORD*>(ret + 8) = 0x400;
-
-            else if (*reinterpret_cast<WORD*>(ret + 8) & 0x800)     // if beast/slugger key is presed
-                *reinterpret_cast<WORD*>(ret + 8) = 0x800;
-        }
-        else
-        {
-            if (should_change_to_legend)
-            {
-                *reinterpret_cast<BYTE*>(ret + 9) = 0x1;
-                should_change_to_legend = false;
-            }
+            *reinterpret_cast<BYTE*>(ret + 0x9) = 0x1;
+            should_change_to_legend = false;
         }
     }
 
@@ -70,7 +54,7 @@ std::int64_t __fastcall hooks::get_current_style::hook_func()
 
             return static_cast<short>(-1);
         }();
-        
+
         if (ret != 3)
         {
             if (GetAsyncKeyState(VK_TAB))
