@@ -47,17 +47,15 @@ void proxy::init()
     proxy::o_CreateDXGIFactory2 = reinterpret_cast<proxy::CreateDXGIFactory2_t>(GetProcAddress(dxgi, "CreateDXGIFactory2"));
     if (!proxy::o_CreateDXGIFactory2)
     {
-        bool is_windows8dot1_or_higher = [system_path]()
+        bool is_windows8dot1_or_higher = []()
         {
-            std::string ntdll_path = std::string(system_path) + "\\ntdll.dll";
-            HMODULE ntdll = LoadLibraryA(ntdll_path.c_str());
-
             bool ret = false;
+            HMODULE ntdll = GetModuleHandleA("ntdll.dll");
 
             if (ntdll)
             {
                 using RtlGetVersion_t = LONG(*)(LPOSVERSIONINFOEXW);
-                RtlGetVersion_t RtlGetVersion = reinterpret_cast<RtlGetVersion_t>(GetProcAddress(ntdll, "RtlGetVersion"));               
+                RtlGetVersion_t RtlGetVersion = reinterpret_cast<RtlGetVersion_t>(GetProcAddress(ntdll, "RtlGetVersion"));
 
                 if (RtlGetVersion)
                 {
@@ -67,8 +65,6 @@ void proxy::init()
 
                     ret = (os_info.dwMajorVersion >= 6 && os_info.dwMinorVersion >= 3) || os_info.dwMajorVersion >= 10;
                 }
-
-                FreeLibrary(ntdll);
             }
 
             return ret;
