@@ -45,24 +45,36 @@ void proxy::init()
         throw std::runtime_error("proxy::init - Failed to get address for CreateDXGIFactory1!");
     
     proxy::o_CreateDXGIFactory2 = reinterpret_cast<proxy::CreateDXGIFactory2_t>(GetProcAddress(dxgi, "CreateDXGIFactory2"));
+    if (!proxy::o_CreateDXGIFactory2)
+    {
+        bool is_windows8dot1_or_higher = [system_path]()
+        {
+            std::string ntdll_path = std::string(system_path) + "\\ntdll.dll";
+            HMODULE ntdll = LoadLibraryA(ntdll_path.c_str());
 
-    /* ::NOTE::
-    * 
-    * this is a bad practice (though it's very unlikely for this to be nullptr unless microsoft changed the name of the function which probably will never happen).
-    * reason is CreateDXGIFactory2 only exist starting from Windows 8.1, making Windows 7 users unable to use this mod if I throw an exception here.
-    * 
-    * on my Windows 10 machine the game calls CreateDXGIFactory1 and CreateDXGIFactory2,
-    * on issue 2 and 3 author's machine which running Windows 7 the game calls CreateDXGIFactory (and probably CreateDXGIFactory1 as well).
-    * 
-    * in other words all CreateDXGIFactory function is needed by the game,
-    * but due to the non-existence of the CreateDXGIFactory2 function on Windows 7 I need to check Windows' version this mod is running on before throwing an exception,
-    * but unfortunately using IsWindows8Point1OrGreater() from VersionHelpers api is not helping at all.
-    * 
-    * for the time being I'll leave it like this (I don't know when I will properly fix this, my school has been giving me tasks like there's no tomorrow ever since quarantine started).
-    * 
-    */
+            bool ret = false;
 
-    // TODO: Proper null checking with windows version
-    /*if (!proxy::o_CreateDXGIFactory2)
-        throw std::runtime_error("proxy::init - Failed to get address for CreateDXGIFactory2!");*/
+            if (ntdll)
+            {
+                using RtlGetVersion_t = LONG(*)(LPOSVERSIONINFOEXW);
+                RtlGetVersion_t RtlGetVersion = reinterpret_cast<RtlGetVersion_t>(GetProcAddress(ntdll, "RtlGetVersion"));               
+
+                if (RtlGetVersion)
+                {
+                    OSVERSIONINFOEXW os_info{};
+                    os_info.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEXW);
+                    RtlGetVersion(&os_info);
+
+                    ret = (os_info.dwMajorVersion >= 6 && os_info.dwMinorVersion >= 3) || os_info.dwMajorVersion >= 10;
+                }
+
+                FreeLibrary(ntdll);
+            }
+
+            return ret;
+        }();
+        
+        if (is_windows8dot1_or_higher)
+            throw std::runtime_error("proxy::init - Failed to get address for CreateDXGIFactory2!");
+    }
 }
