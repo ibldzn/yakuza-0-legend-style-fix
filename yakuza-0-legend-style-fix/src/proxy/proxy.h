@@ -4,7 +4,7 @@
 #include <string>
 #include <cstdint>
 
-#define WIN32_LEAN_AND_MEAN1
+#define WIN32_LEAN_AND_MEAN
 #  include <Windows.h>
 #undef WIN32_LEAN_AND_MEAN
 
