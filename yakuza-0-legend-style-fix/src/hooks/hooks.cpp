@@ -19,20 +19,15 @@ void hooks::init()
 std::int64_t __fastcall hooks::get_key_press::hook_func(std::int64_t a1)
 {
     static uintptr_t first_call = mem::ida_pattern_scan("F6 40 09 01 0F 84 ? ? ? ?");
-    static uintptr_t last_call = mem::ida_pattern_scan("B9 ? ? ? ? 66 85 48 08 74 68");
-    uintptr_t return_address = reinterpret_cast<uintptr_t>(_ReturnAddress());
-
     std::int64_t ret = o_get_key_press(a1);
 
-    // check if call was made from sub_140359E80
-    // TODO: find a more proper way to check this
-    if (return_address >= first_call && return_address <= last_call)
+    if (reinterpret_cast<uintptr_t>(_ReturnAddress()) != first_call)
+        return ret;
+
+    if (should_change_to_legend)
     {
-        if (should_change_to_legend)
-        {
-            *reinterpret_cast<BYTE*>(ret + 0x9) = 0x1;
-            should_change_to_legend = false;
-        }
+        *reinterpret_cast<BYTE*>(ret + 0x9) = 0x1;
+        should_change_to_legend = false;
     }
 
     return ret;
@@ -41,46 +36,42 @@ std::int64_t __fastcall hooks::get_key_press::hook_func(std::int64_t a1)
 std::int64_t __fastcall hooks::get_current_style::hook_func()
 {
     static uintptr_t call_from_sub_140359E80 = mem::ida_pattern_scan("48 8D 4F 30 83 F8 03");
-    std::int64_t ret = o_get_current_style();
+    std::int64_t cur_style = o_get_current_style();
 
-    if (reinterpret_cast<uintptr_t>(_ReturnAddress()) == call_from_sub_140359E80)
+    if (reinterpret_cast<uintptr_t>(_ReturnAddress()) != call_from_sub_140359E80)
+        return cur_style;
+
+    static short index = []()
     {
-        static short index = []()
+        XINPUT_STATE dummy{};
+        for (short i = 0; i < 4; i++)
+            if (XInputGetState(i, &dummy) == ERROR_SUCCESS)
+                return i;
+
+        return static_cast<short>(-1);
+    }();
+
+    if (cur_style != 3) // LEGEND
+    {
+        if (GetAsyncKeyState(VK_TAB) & 0x8000)
         {
-            XINPUT_STATE dummy;
-            for (short i = 0; i < 4; i++)
-                if (XInputGetState(i, &dummy) == ERROR_SUCCESS)
-                    return i;
+            should_change_to_legend = true;
+            return 3;
+        }
 
-            return static_cast<short>(-1);
-        }();
-
-        if (ret != 3)
+        if (index != -1)
         {
-            if (GetAsyncKeyState(VK_TAB))
+            XINPUT_STATE state{};
+            if (XInputGetState(index, &state) == ERROR_SUCCESS)
             {
-                should_change_to_legend = true;
-                ret = 3;
-            }
-
-            if (index != -1)
-            {
-                XINPUT_STATE state{};
-                if (XInputGetState(index, &state) == ERROR_SUCCESS)
+                if (state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB)
                 {
-                    if (state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB)
-                    {
-                        should_change_to_legend = true;
-                        ret = 3;
-                    }
+                    should_change_to_legend = true;
+                    return 3;
                 }
             }
         }
-        else
-        {
-            ret = -1;
-        }
     }
-
-    return ret;
+    
+    return -1;
 }
