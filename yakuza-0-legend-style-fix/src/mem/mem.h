@@ -1,14 +1,6 @@
 #pragma once
 
-#include <stdexcept>
-#include <vector>
-
-#define WIN32_LEAN_AND_MEAN
-#  include <Windows.h>
-#  include <Psapi.h>
-#undef WIN32_LEAN_AND_MEAN
-
-#include "../../minhook/MinHook.h"
+#include "../../deps/minhook/include/MinHook.h"
 
 namespace mem
 {

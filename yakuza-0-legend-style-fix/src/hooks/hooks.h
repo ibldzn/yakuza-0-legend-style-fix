@@ -1,13 +1,6 @@
 #pragma once
+
 #include <cstdint>
-#include <intrin.h>
-
-#define WIN32_LEAN_AND_MEAN
-#  include <Windows.h>
-#  include <Xinput.h>
-#undef WIN32_LEAN_AND_MEAN
-
-#include "../mem/mem.h"
 
 namespace hooks
 {

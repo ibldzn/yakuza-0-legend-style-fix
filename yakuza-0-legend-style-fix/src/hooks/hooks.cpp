@@ -1,4 +1,14 @@
+#include <stdexcept>
+#include <intrin.h>
+
+#define WIN32_LEAN_AND_MEAN
+#  include <Windows.h>
+#undef WIN32_LEAN_AND_MEAN
+
+#include <Xinput.h>
+
 #include "hooks.h"
+#include "../mem/mem.h"
 
 static hooks::get_key_press::fn o_get_key_press = nullptr;
 static hooks::get_current_style::fn o_get_current_style = nullptr;
@@ -21,10 +31,8 @@ std::int64_t __fastcall hooks::get_key_press::hook_func(std::int64_t a1)
     static uintptr_t first_call = mem::ida_pattern_scan("F6 40 09 01 0F 84 ? ? ? ?");
     std::int64_t ret = o_get_key_press(a1);
 
-    if (reinterpret_cast<uintptr_t>(_ReturnAddress()) != first_call)
-        return ret;
-
-    if (should_change_to_legend)
+    if (reinterpret_cast<uintptr_t>(_ReturnAddress()) == first_call &&
+        should_change_to_legend)
     {
         *reinterpret_cast<BYTE*>(ret + 0x9) = 0x1;
         should_change_to_legend = false;
@@ -51,7 +59,7 @@ std::int64_t __fastcall hooks::get_current_style::hook_func()
         return static_cast<short>(-1);
     }();
 
-    if (cur_style != 3) // LEGEND
+    if (cur_style != 3) // !LEGEND
     {
         if (GetAsyncKeyState(VK_TAB) & 0x8000)
         {
@@ -62,14 +70,14 @@ std::int64_t __fastcall hooks::get_current_style::hook_func()
         if (index != -1)
         {
             XINPUT_STATE state{};
-            if (XInputGetState(index, &state) == ERROR_SUCCESS)
-            {
-                if (state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB)
-                {
-                    should_change_to_legend = true;
-                    return 3;
-                }
-            }
+            if (XInputGetState(index, &state) != ERROR_SUCCESS)
+                return cur_style;
+
+            if (!(state.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB))
+                return cur_style;
+            
+            should_change_to_legend = true;
+            return 3;
         }
     }
     

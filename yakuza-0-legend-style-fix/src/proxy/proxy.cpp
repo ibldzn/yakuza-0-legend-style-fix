@@ -1,56 +1,62 @@
+#include <stdexcept>
+#include <string>
+
 #include "proxy.h"
 
-#ifndef PROXY_API
-#  define PROXY_API extern "C" __declspec(dllexport)
-#endif
+#ifndef Y0LSF_USE_ASI
 
-static proxy::CreateDXGIFactory_t proxy::o_CreateDXGIFactory = nullptr;
-static proxy::CreateDXGIFactory1_t proxy::o_CreateDXGIFactory1 = nullptr;
-static proxy::CreateDXGIFactory2_t proxy::o_CreateDXGIFactory2 = nullptr;
+    static proxy::CreateDXGIFactory_t o_CreateDXGIFactory = nullptr;
+    static proxy::CreateDXGIFactory1_t o_CreateDXGIFactory1 = nullptr;
+    static proxy::CreateDXGIFactory2_t o_CreateDXGIFactory2 = nullptr;
 
-PROXY_API HRESULT CreateDXGIFactory(REFIID riid, void** ppFactory)
-{
-    return proxy::o_CreateDXGIFactory(riid, ppFactory);
-}
+# define Y0LSF_API extern "C" __declspec(dllexport)
 
-PROXY_API HRESULT CreateDXGIFactory1(REFIID riid, void** ppFactory)
-{
-    return proxy::o_CreateDXGIFactory1(riid, ppFactory);
-}
+    Y0LSF_API HRESULT CreateDXGIFactory(REFIID riid, void** ppFactory)
+    {
+        return o_CreateDXGIFactory(riid, ppFactory);
+    }
 
-PROXY_API HRESULT CreateDXGIFactory2(UINT Flag, REFIID riid, void** ppFactory)
-{
-    return proxy::o_CreateDXGIFactory2(Flag, riid, ppFactory);
-}
+    Y0LSF_API HRESULT CreateDXGIFactory1(REFIID riid, void** ppFactory)
+    {
+        return o_CreateDXGIFactory1(riid, ppFactory);
+    }
 
-#undef PROXY_API
+    Y0LSF_API HRESULT CreateDXGIFactory2(UINT Flag, REFIID riid, void** ppFactory)
+    {
+        return o_CreateDXGIFactory2(Flag, riid, ppFactory);
+    }
+
+# undef Y0LSF_API
+
+#endif // !Y0LSF_USE_ASI
 
 void proxy::init()
 {
-    char system_path[MAX_PATH]{};
-    if (GetSystemDirectoryA(system_path, MAX_PATH) == NULL)
+#ifndef Y0LSF_USE_ASI
+    wchar_t system_path[MAX_PATH]{};
+    if (GetSystemDirectory(system_path, MAX_PATH) == NULL)
         throw std::runtime_error("proxy::init - Failed to get system path!");
 
-    std::string dxgi_path = std::string(system_path) + "\\dxgi.dll";
-    HMODULE dxgi = LoadLibraryA(dxgi_path.c_str());
+    std::wstring dxgi_path = std::wstring(system_path) + L"\\dxgi.dll";
+    HMODULE dxgi = LoadLibrary(dxgi_path.c_str());
     if (!dxgi)
         throw std::runtime_error("proxy::init - Failed to load original dxgi.dll!");
 
-    proxy::o_CreateDXGIFactory = reinterpret_cast<proxy::CreateDXGIFactory_t>(GetProcAddress(dxgi, "CreateDXGIFactory"));
-    if (!proxy::o_CreateDXGIFactory)
+    o_CreateDXGIFactory = reinterpret_cast<proxy::CreateDXGIFactory_t>(GetProcAddress(dxgi, "CreateDXGIFactory"));
+    if (!o_CreateDXGIFactory)
         throw std::runtime_error("proxy::init - Failed to get address for CreateDXGIFactory!");
 
-    proxy::o_CreateDXGIFactory1 = reinterpret_cast<proxy::CreateDXGIFactory1_t>(GetProcAddress(dxgi, "CreateDXGIFactory1"));
-    if (!proxy::o_CreateDXGIFactory1)
+    o_CreateDXGIFactory1 = reinterpret_cast<proxy::CreateDXGIFactory1_t>(GetProcAddress(dxgi, "CreateDXGIFactory1"));
+    if (!o_CreateDXGIFactory1)
         throw std::runtime_error("proxy::init - Failed to get address for CreateDXGIFactory1!");
-    
-    proxy::o_CreateDXGIFactory2 = reinterpret_cast<proxy::CreateDXGIFactory2_t>(GetProcAddress(dxgi, "CreateDXGIFactory2"));
-    if (!proxy::o_CreateDXGIFactory2)
+
+    o_CreateDXGIFactory2 = reinterpret_cast<proxy::CreateDXGIFactory2_t>(GetProcAddress(dxgi, "CreateDXGIFactory2"));
+    if (!o_CreateDXGIFactory2)
     {
         bool is_windows8dot1_or_higher = []()
         {
             bool ret = false;
-            HMODULE ntdll = GetModuleHandleA("ntdll.dll");
+            HMODULE ntdll = GetModuleHandle(L"ntdll.dll");
 
             if (ntdll)
             {
@@ -69,8 +75,9 @@ void proxy::init()
 
             return ret;
         }();
-        
+
         if (is_windows8dot1_or_higher)
             throw std::runtime_error("proxy::init - Failed to get address for CreateDXGIFactory2!");
     }
+#endif // !Y0LSF_USE_ASI
 }
