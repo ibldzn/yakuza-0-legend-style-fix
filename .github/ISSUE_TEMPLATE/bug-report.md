@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-- [ ] I have read the whole [README](https://github.com/ibldzn/yakuza-0-legend-style-fix#readme) especially the [The mod conflict with other mod that I'm using, What should I do?](https://github.com/ibldzn/yakuza-0-legend-style-fix#the-mod-conflict-with-other-mod-that-im-using-what-should-i-do) segment and have tried the solution given there.
+- [ ] I have read the whole [README](https://github.com/ibldzn/yakuza-0-legend-style-fix#readme) especially the [I'm having issue with your mod, what should I do?](https://github.com/ibldzn/yakuza-0-legend-style-fix#im-having-issue-with-your-mod-what-should-i-do) segment and have tried the solution given there.
 - [ ] I am using the latest Steam version of the game.
 
 _Place an "x" without quotation mark inside the bracket to check the checkbox, so it'll look like this:_ [x] (no space between x and brackets).
