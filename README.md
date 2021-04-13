@@ -31,7 +31,7 @@ press your regular key to change from legend style.
    ![Screenshot](https://i.imgur.com/Yi3XAIP.png)
 5. Done!
 
-## The mod conflict with other mod that I'm using, What should I do?
+## I'm having issue with your mod, what should I do?
 
 <h3>
   <p align="center">
