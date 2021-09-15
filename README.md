@@ -57,7 +57,7 @@ If you already have an ASI Loader (usually named as `dinput8.dll`), you just hav
 
 # Build
 
-Make sure you have [CMake](https://cmake.org/) installed and a shell which supports bash command, run `./build.sh Release` or
+Make sure you can run bash command and have [CMake](https://cmake.org/) installed, then run `./build.sh Release` or
 `./build.sh Release -DASI_VER=OFF` to build the non-asi version. The binary should be inside the `_out/` directory after you run the build command.
 
 # Credit
