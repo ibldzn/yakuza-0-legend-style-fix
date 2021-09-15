@@ -51,7 +51,7 @@ If you already have an ASI Loader (usually named as `dinput8.dll`), you just hav
 
 # Known Issue
 
-- ~~Change style animation sometimes [won't play correctly](https://youtu.be/Hz94Aow_Z8s?t=20) when changing to or from legend style.~~ As of 1.0, I haven't encountered any after 2 hours of gameplay. (The issue might still be there, but who knows..)
+- Change style animation sometimes [won't play correctly](https://youtu.be/Hz94Aow_Z8s?t=20) when changing to or from legend style.
 - If you find any more issue please make sure to [create an issue](https://github.com/ibldzn/yakuza-0-legend-style-fix/issues/new)
   or contact me on discord `ibldzn#1649`.
 
