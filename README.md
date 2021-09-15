@@ -10,6 +10,14 @@ Allows you to change to legend style and normal style back and forth without goi
   </p>
 </h3>
 
+# Changelog
+
+`1.0`:
+
+- Code cleanup
+- Fixed an issue where if your controller gets disconnected the mod won't respond to your R3/RS keypress after reconnecting
+- Apache 2.0 -> MIT
+
 # Usage
 
 When in fight press R3/RS on controller or TAB on keyboard to change to legend style,
@@ -25,43 +33,32 @@ press your regular key to change from legend style.
 # Installation
 
 1. Download the "dxgi.dll" file from the [latest release](https://github.com/ibldzn/yakuza-0-legend-style-fix/releases/latest).
-2. Navigate to your Y0 directory (where Yakuza0.exe is located).
-3. Copy and paste the file you just downloaded to Y0 directory.
-4. Your Y0 directory now should look something like this
+2. Navigate to your game directory (where Yakuza0.exe is located).
+3. Copy and paste the file you just downloaded to game directory.
+4. Your game directory now should look something like this
    ![Screenshot](https://i.imgur.com/Yi3XAIP.png)
 5. Done!
 
 ## I'm having issue with your mod, what should I do?
 
-<h3>
-  <p align="center">
-    <b>[RECOMMENDED WAY]</b>
-  </p>
-</h3>
-
-Download "Y0LSF.asi" file in the [release tab](https://github.com/ibldzn/yakuza-0-legend-style-fix/releases/latest),
+Download `Y0LSF.asi` file in the [release tab](https://github.com/ibldzn/yakuza-0-legend-style-fix/releases/latest),
 get an ASI Loader ([like this one](https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases) for example),
-place the ASI Loader in the game root directory, where to put the "Y0LSF.asi" file depends on what ASI Loader you're using,
-if you use the one I linked, you can read the [usage](https://github.com/ThirteenAG/Ultimate-ASI-Loader#usage) segment in their README.
+place both the ASI Loader and `Y0LSF.asi` in the game root directory.
 
-<h3>
-  <p align="center">
-    <b>[WORKS BUT NOT ADVISED WAY]</b>
-  </p>
-</h3>
+If you already have an ASI Loader (usually named as `dinput8.dll`), you just have to move `Y0LSF.asi` to your game directory.
 
-Get any DLL injector, then inject the "Y0LSF.asi" file into the game. Keep in mind that you'll have to do this everytime you start the game.
-
-<h3><p align="center">If neither of those works, please <a href="https://github.com/ibldzn/yakuza-0-legend-style-fix/issues/new">create an issue</a>.</p></h3>
-
-# Improvement
-
-Pull requests are more than welcome!
+<h3><p align="center">If it still doesn't work, please <a href="https://github.com/ibldzn/yakuza-0-legend-style-fix/issues/new">create an issue</a>.</p></h3>
 
 # Known Issue
 
-- Change style animation sometimes [won't play correctly](https://youtu.be/Hz94Aow_Z8s?t=20) when changing to or from legend style.
-- If you find any more issues please make sure to [create an issue](https://github.com/ibldzn/yakuza-0-legend-style-fix/issues/new).
+- ~~Change style animation sometimes [won't play correctly](https://youtu.be/Hz94Aow_Z8s?t=20) when changing to or from legend style.~~ As of 1.0, I haven't encountered any after 2 hours of gameplay. (The issue might still be there, but who knows..)
+- If you find any more issue please make sure to [create an issue](https://github.com/ibldzn/yakuza-0-legend-style-fix/issues/new)
+  or contact me on discord `ibldzn#1649`.
+
+# Build
+
+Make sure you have [CMake](https://cmake.org/) installed and a shell which supports bash command, run `./build.sh Release` or
+`./build.sh Release -DASI_VER=OFF` to build the non-asi version. The binary should be inside the `_out/` directory after you run the build command.
 
 # Credit
 

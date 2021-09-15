@@ -1,2 +1,3 @@
-.vs/
-bin/
+_out/
+_build/
+.vscode/
