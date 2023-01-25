@@ -1,6 +1,7 @@
 #include "hooks.hpp"
 
 #include "mem.hpp"
+#include "utils.hpp"
 
 #include <stdexcept>
 #include <MinHook.h>
@@ -43,8 +44,8 @@ void hooks::destroy()
 
 static int64_t __fastcall hk_get_key_press(uintptr_t rcx)
 {
-    static uintptr_t first_call = mem::pattern_scan("yakuza0.exe", "F6 40 09 01 0F 84 ? ? ? ?");
-    static uintptr_t last_call = mem::pattern_scan("yakuza0.exe", "B9 ? ? ? ? 66 85 48 08 74 68");
+    static const uintptr_t first_call = mem::pattern_scan("yakuza0.exe", "F6 40 09 01 0F 84 ? ? ? ?");
+    static const uintptr_t last_call = mem::pattern_scan("yakuza0.exe", "B9 ? ? ? ? 66 85 48 08 74 68");
 
     int64_t key_state = o_get_key_press(rcx);
 
@@ -64,7 +65,7 @@ static int64_t __fastcall hk_get_key_press(uintptr_t rcx)
 
 static int32_t __fastcall hk_get_current_style()
 {
-    static uintptr_t call_from_sub_140359E80 = mem::pattern_scan("yakuza0.exe", "48 8D 4F 30 83 F8 03");
+    static const uintptr_t call_from_sub_140359E80 = mem::pattern_scan("yakuza0.exe", "48 8D 4F 30 83 F8 03");
     int32_t style = o_get_current_style();
 
     if (reinterpret_cast<uintptr_t>(_ReturnAddress()) != call_from_sub_140359E80)
@@ -75,7 +76,9 @@ static int32_t __fastcall hk_get_current_style()
     if (style == 3)
         return -1;
 
-    if (was_right_analog_pressed || (GetAsyncKeyState(VK_TAB) & 0x8000))
+    static const auto key = utils::get_keybinding();
+
+    if (was_right_analog_pressed || (GetAsyncKeyState(key) & 0x8000))
     {
         should_change_to_legend = true;
         return 3;

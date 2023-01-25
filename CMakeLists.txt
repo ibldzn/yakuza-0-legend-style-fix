@@ -30,6 +30,7 @@ add_library(${PROJECT_NAME} SHARED
   src/main.cpp
   src/core/hooks.cpp
   src/core/mem.cpp
+  src/core/utils.cpp
   src/proxy/proxy.cpp
 )
 
