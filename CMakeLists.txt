@@ -9,6 +9,7 @@ option(ENABLE_LTO "Enable Link Time Optimization" ON)
 option(ASI_VER "Build .asi version of the mod" ON)
 
 set(COMPILE_DEFS WIN32_LEAN_AND_MEAN NOMINMAX NOGDI)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 
 if(ASI_VER)
   message(STATUS "Building asi version")
